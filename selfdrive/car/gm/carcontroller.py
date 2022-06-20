@@ -88,12 +88,12 @@ class CarController():
     elif CS.adaptive_Cruise:
 
       # acc_mult = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS, 30* CV.KPH_TO_MS, 40* CV.KPH_TO_MS ], [0.17, 0.24, 0.265, 0.24])
-      accelFomula = (actuators.accel / 9.25 if actuators.accel >=0 else actuators.accel / 9.5 )
+      accelFomula = (actuators.accel / 8.75 if actuators.accel >=0 else actuators.accel / 9.25 )
       pedalValue = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.1650, 0.2100]) + accelFomula
       pedalValue = min(pedalValue, interp(CS.out.vEgo, [0., 19.0 * CV.KPH_TO_MS], [0.2550, 0.2750]) )
 
       self.comma_pedal_original = pedalValue # (actuators.accel * acc_mult, 0., 1.)
-      self.comma_pedal_new = clip (interp(actuators.accel, [-0.85, -0.35, 0.00, 0.20], [0.0, 0.1500, 0.2190, 0.2205]) + accelFomula , 0., 1.)
+      self.comma_pedal_new = clip (interp(actuators.accel, [-0.85, -0.35, 0.00, 0.20], [0.0, 0.1650, 0.2190, 0.2205]) + accelFomula , 0., 1.)
 
       gapInterP = interp(CS.out.vEgo, [19 * CV.KPH_TO_MS, 45*CV.KPH_TO_MS], [1, 0])
       self.comma_pedal =  (gapInterP * self.comma_pedal_original)  +  ((1.0-gapInterP) * self.comma_pedal_new)
