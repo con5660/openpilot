@@ -87,9 +87,16 @@ class CarController():
 
     elif CS.adaptive_Cruise:
 
-      acc_mult = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS, 30* CV.KPH_TO_MS, 40* CV.KPH_TO_MS ], [0.17, 0.24, 0.265, 0.24])
+      # acc_mult = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS, 30* CV.KPH_TO_MS, 40* CV.KPH_TO_MS ], [0.17, 0.24, 0.265, 0.24])
+
+      accelFomula = (actuators.accel / 9 if actuators.accel >=0 else actuators.accel / 10 )
+      acc_mult = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.1650, 0.2100]) + accelFomula
+
+
+
+
       self.comma_pedal_original = clip(actuators.accel * acc_mult, 0., 1.)
-      self.comma_pedal_new = clip (interp(actuators.accel, [-0.925 , 0.0, 0.2], [0.0, 0.2190, 0.2205]) + (actuators.accel / 10 if actuators.accel >=0 else actuators.accel / 9 ), 0., 1.)
+      self.comma_pedal_new = clip (interp(actuators.accel, [-0.925 , 0.0, 0.2], [0.0, 0.2190, 0.2205]) + accelFomula , 0., 1.)
 
       gapInterP = interp(CS.out.vEgo, [19 * CV.KPH_TO_MS, 45*CV.KPH_TO_MS], [1, 0])
       self.comma_pedal =  (gapInterP * self.comma_pedal_original)  +  ((1.0-gapInterP) * self.comma_pedal_new)
@@ -123,7 +130,7 @@ class CarController():
             if self.stoppingStateTimeWindowsActiveCounter > 0 :
               actuators.pedalStartingAdder = interp(CS.out.vEgo, [0.0, 5.0 * CV.KPH_TO_MS ,12.5 * CV.KPH_TO_MS , 25.0 * CV.KPH_TO_MS], [0.1850,0.2275, 0.1750, 0.025])
               if d > 0:
-                actuators.pedalDistanceAdder = interp(d, [1, 10, 15, 30], [-0.0250 ,  -0.0075 ,0.0175,0.1000])
+                actuators.pedalDistanceAdder = interp(d, [1,6,8, 10, 15, 30], [-1.0250 ,-0.5000 ,-0.0325 ,  -0.0075 ,0.0175,0.1000])
               actuators.pedalAdderFinal = (actuators.pedalStartingAdder + actuators.pedalDistanceAdder)
 
             if self.stoppingStateTimeWindowsActiveCounter > (stoppingStateWindowsActiveCounterLimits)  \
@@ -131,7 +138,7 @@ class CarController():
                     or  CS.out.vEgo > 35*CV.KPH_TO_MS \
                     or controls.LoC.pid.f < -0.65 \
                     or actuators.accel < - 1.1 :
-              if controls.LoC.pid.f < -0.625   or actuators.accel < - 1.1 :
+              if controls.LoC.pid.f < -0.625   or actuators.accel < - 1.25 :
                 self.stoppingStateTimeWindowsClosingAdder = 0
               else :
                 self.stoppingStateTimeWindowsClosingAdder = actuators.pedalAdderFinal
@@ -156,7 +163,7 @@ class CarController():
               self.stoppingStateTimeWindowsActive =False
 
           self.comma_pedal += actuators.pedalAdderFinal
-          self.comma_pedal = min(self.comma_pedal, 0.2975)
+          self.comma_pedal = min(self.comma_pedal, 0.3075)
 
       #braking logic
       if actuators.accel < -0.15 :
