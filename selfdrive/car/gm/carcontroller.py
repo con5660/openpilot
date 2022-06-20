@@ -89,16 +89,16 @@ class CarController():
 
       # acc_mult = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS, 30* CV.KPH_TO_MS, 40* CV.KPH_TO_MS ], [0.17, 0.24, 0.265, 0.24])
 
-      accelFomula = (actuators.accel / 9 if actuators.accel >=0 else actuators.accel / 10 )
+      accelFomula = (actuators.accel / 8.7 if actuators.accel >=0 else actuators.accel / 10 )
       pedalValue = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.1650, 0.2100]) + accelFomula
-      pedalValue = min(pedalValue, interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.2750, 0.2999]) )
+      pedalValue = min(pedalValue, interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.2550, 0.2750]) )
 
 
 
 
 
       self.comma_pedal_original = pedalValue # (actuators.accel * acc_mult, 0., 1.)
-      self.comma_pedal_new = clip (interp(actuators.accel, [-0.925 , 0.0, 0.2], [0.0, 0.2190, 0.2205]) + accelFomula , 0., 1.)
+      self.comma_pedal_new = clip (interp(actuators.accel, [-0.925 , 0.0, 0.2], [0.0, 0.2197, 0.2220]) + accelFomula , 0., 1.)
 
       gapInterP = interp(CS.out.vEgo, [19 * CV.KPH_TO_MS, 45*CV.KPH_TO_MS], [1, 0])
       self.comma_pedal =  (gapInterP * self.comma_pedal_original)  +  ((1.0-gapInterP) * self.comma_pedal_new)
@@ -139,8 +139,8 @@ class CarController():
                     or (controls.LoC.long_control_state == LongCtrlState.stopping) \
                     or  CS.out.vEgo > 35*CV.KPH_TO_MS \
                     or controls.LoC.pid.f < -0.65 \
-                    or actuators.accel < - 1.1 :
-              if controls.LoC.pid.f < -0.625   or actuators.accel < - 1.25 :
+                    or actuators.accel < - 1.15 :
+              if controls.LoC.pid.f < -0.625   or actuators.accel < - 1.225 :
                 self.stoppingStateTimeWindowsClosingAdder = 0
               else :
                 self.stoppingStateTimeWindowsClosingAdder = actuators.pedalAdderFinal
