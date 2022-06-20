@@ -89,9 +89,9 @@ class CarController():
 
       # acc_mult = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS, 30* CV.KPH_TO_MS, 40* CV.KPH_TO_MS ], [0.17, 0.24, 0.265, 0.24])
 
-      accelFomula = (actuators.accel / 8.7 if actuators.accel >=0 else actuators.accel / 10 )
+      accelFomula = (actuators.accel / 8.95 if actuators.accel >=0 else actuators.accel / 9.75 )
       pedalValue = interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.1650, 0.2100]) + accelFomula
-      pedalValue = min(pedalValue, interp(CS.out.vEgo, [0., 18.0 * CV.KPH_TO_MS], [0.2550, 0.2750]) )
+      pedalValue = min(pedalValue, interp(CS.out.vEgo, [0., 19.0 * CV.KPH_TO_MS], [0.2550, 0.2750]) )
 
 
 
